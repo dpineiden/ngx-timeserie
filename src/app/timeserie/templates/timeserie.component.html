@@ -1,0 +1,111 @@
+    <ngx-charts-chart
+      [view]="[width, height]"
+      [showLegend]="legend"
+      [legendOptions]="legendOptions"
+      [activeEntries]="activeEntries"
+      (legendLabelClick)="onClick($event)"
+      (legendLabelActivate)="onActivate($event)"
+      (legendLabelDeactivate)="onDeactivate($event)">
+      <svg:defs>
+        <svg:clipPath [attr.id]="clipPathId">
+          <svg:rect
+            [attr.width]="dims.width + 10"
+            [attr.height]="dims.height + 10"
+            [attr.transform]="'translate(-5, -5)'"/>
+        </svg:clipPath>
+      </svg:defs>
+      <svg:g [attr.transform]="transform" class="line-chart chart">
+        <svg:g ngx-charts-x-axis
+          *ngIf="xAxis"
+          [attr.xScale]="xScale"
+          [attr.dims]="dims"
+          [attr.showGridLines]="showGridLines"
+          [attr.showLabel]="showXAxisLabel"
+          [attr.labelText]="xAxisLabel"
+          [attr.tickFormatting]="xAxisTickFormatting"
+          (dimensionsChanged)="updateXAxisHeight($event)">
+        </svg:g>
+        <svg:g ngx-charts-y-axis
+          *ngIf="yAxis"
+          [attr.yScale]="yScale"
+          [attr.dims]="dims"
+          [attr.showGridLines]="showGridLines"
+          [attr.showLabel]="showYAxisLabel"
+          [attr.labelText]="yAxisLabel"
+          [attr.tickFormatting]="yAxisTickFormatting"
+          [attr.referenceLines]="referenceLines"
+          [attr.showRefLines]="showRefLines"
+          [attr.showRefLabels]="showRefLabels"
+          (dimensionsChanged)="updateYAxisWidth($event)">
+        </svg:g>
+        <svg:g [attr.clip-path]="clipPath">
+          <svg:g *ngFor="let series of results; trackBy:trackBy" [@animationState]="'active'">
+            <svg:g ngx-charts-line-series
+              [attr.xScale]="xScale"
+              [attr.yScale]="yScale"
+              [attr.colors]="colors"
+              [attr.data]="series"
+              [attr.activeEntries]="activeEntries"
+              [attr.scaleType]="scaleType"
+              [attr.curve]="curve"
+              [attr.rangeFillOpacity]="rangeFillOpacity"
+              [attr.hasRange]="hasRange"
+            />
+          </svg:g>
+
+          <svg:g *ngIf="!tooltipDisabled" (mouseleave)="hideCircles()">
+            <svg:g ngx-charts-tooltip-area
+              [attr.dims]="dims"
+              [attr.xSet]="xSet"
+              [attr.xScale]="xScale"
+              [attr.yScale]="yScale"
+              [attr.results]="results"
+              [attr.colors]="colors"
+              [attr.tooltipDisabled]="tooltipDisabled"
+              [attr.tooltipTemplate]="seriesTooltipTemplate"
+              (hover)="updateHoveredVertical($event)"
+            />
+
+            <svg:g *ngFor="let series of results">
+              <svg:g ngx-charts-circle-series
+                [attr.xScale]="xScale"
+                [attr.yScale]="yScale"
+                [attr.colors]="colors"
+                [attr.data]="series"
+                [attr.scaleType]="scaleType"
+                [attr.visibleValue]="hoveredVertical"
+                [attr.activeEntries]="activeEntries"
+                [attr.tooltipDisabled]="tooltipDisabled"
+                [attr.tooltipTemplate]="tooltipTemplate"
+                (select)="onClick($event, series)"
+                (activate)="onActivate($event)"
+                (deactivate)="onDeactivate($event)"
+              />
+            </svg:g>
+          </svg:g>
+        </svg:g>
+      </svg:g>
+      <svg:g ngx-charts-timeline
+        *ngIf="timeline && scaleType === 'time'"
+        [attr.transform]="timelineTransform"
+        [attr.results]="results"
+        [attr.view]="[timelineWidth, height]"
+        [attr.height]="timelineHeight"
+        [attr.scheme]="scheme"
+        [attr.customColors]="customColors"
+        [attr.scaleType]="scaleType"
+        [attr.legend]="legend"
+        (onDomainChange)="updateDomain($event)">
+        <svg:g *ngFor="let series of results; trackBy:trackBy">
+          <svg:g ngx-charts-line-series
+            [attr.xScale]="timelineXScale"
+            [attr.yScale]="timelineYScale"
+            [attr.colors]="colors"
+            [attr.data]="series"
+            [attr.scaleType]="scaleType"
+            [attr.curve]="curve"
+            [attr.hasRange]="hasRange"
+          />
+        </svg:g>
+      </svg:g>
+    </ngx-charts-chart>
