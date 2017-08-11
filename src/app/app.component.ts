@@ -50,6 +50,9 @@ export class AppComponent implements OnInit {
 
     ngOnInit() {
         this.chartType = 'time-serie'
+        this.realTimeData = true
+
+        setInterval(this.updateData.bind(this), 1000)
 
     }
 
@@ -68,6 +71,8 @@ export class AppComponent implements OnInit {
             };
             this.single = [...this.single, entry];
         }
+
+        console.log(this.single)
 
     }
 
